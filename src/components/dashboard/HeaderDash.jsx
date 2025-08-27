@@ -1,3 +1,5 @@
+import { LogoutButton } from "./LogoutButton";
+
 export const HeaderDash = () => {
   return (
     <header
@@ -6,6 +8,7 @@ export const HeaderDash = () => {
      shadow-[10px_-2px_10px_rgba(0,0,0,0.1)]"
     >
       <p className="text-4xl text-blue-500">Dashboard</p>
+      <LogoutButton/>
       <div className="lg:hidden flex justify-center items-center text-gray-600 hover:text-blue-500 cursor-pointer">
         <span
           className="material-symbols-outlined"

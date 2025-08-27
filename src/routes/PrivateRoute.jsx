@@ -1,4 +1,6 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
 
 export const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -8,8 +10,20 @@ export const PrivateRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // aqui você pode opcionalmente validar o token (JWT) expirado
-  // ex.: decodificar e checar exp
+  try {
+    const decoded = jwtDecode(token);
+    const now = Date.now() / 1000; // timestamp em segundos
 
-  return <Outlet />;
+    if (decoded.exp && decoded.exp < now) {
+      // token expirou
+      localStorage.removeItem("token");
+      return <Navigate to="/login" replace />;
+    }
+  } catch (err) {
+    // token inválido
+    localStorage.removeItem("token");
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 };

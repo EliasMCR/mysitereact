@@ -11,6 +11,12 @@ export async function login(email, senha) {
     throw new Error("Erro ao autenticar");
   }
 
-  const token = await response.text(); // <-- aqui
-  return { token }; // cria objeto com token
+  // Agora o backend retorna JSON { token, idImobiliaria }
+  const data = await response.json();
+
+  // Salva token e idImobiliaria no localStorage (ou state global)
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("imobiliariaId", data.idImobiliaria);
+
+  return data; // retorna { token, idImobiliaria }
 }

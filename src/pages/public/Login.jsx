@@ -21,6 +21,7 @@ export default function Login() {
     try {
       const data = await login(email, senha);
       localStorage.setItem("token", data.token); // 🔑 salva token
+      localStorage.setItem("imobiliariaId", data.id); // 🔑 salva token
       if (lembrarMe) {
         // salva o input email
         localStorage.setItem("email", email); // salva email
