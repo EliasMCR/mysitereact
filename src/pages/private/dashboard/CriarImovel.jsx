@@ -1,10 +1,10 @@
 import { FormImovel } from "../../../components/dashboard/FormImovel";
-import {URL_BASE} from "../../../config";
+import {BASE_URL} from "../../../config";
 
 export const CriarImovel = () => {
   const criarImovel = async (dados) => {
     try {
-      const response = await fetch(`${URL_BASE}/imoveis/cadastro`, {
+      const response = await fetch(`${BASE_URL}/imoveis/cadastro`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

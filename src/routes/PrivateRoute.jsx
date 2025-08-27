@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 export const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -11,5 +11,5 @@ export const PrivateRoute = ({ children }) => {
   // aqui você pode opcionalmente validar o token (JWT) expirado
   // ex.: decodificar e checar exp
 
-  return children;
+  return <Outlet />;
 };

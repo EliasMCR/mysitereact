@@ -11,6 +11,7 @@ import { PrivateRoute } from "./routes/PrivateRoute";
 import { CriarImovel } from "./pages/private/dashboard/CriarImovel";
 import { ListarImovel } from "./pages/private/dashboard/ListarImovel";
 import { EditarImovel } from "./pages/private/dashboard/EditarImovel";
+import {ConfigImobiliaria} from "./pages/private/dashboard/ConfigImobiliaria";
 
 function App() {
   return (
@@ -24,18 +25,13 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           {/* Rotas privadas */}
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <DashboardLayout />
-              </PrivateRoute>
-            }
-          >
-            {/* Nested Routes (ficam dentro do layout do dashboard) */}
-            <Route path="criar" element={<CriarImovel />} />
-            <Route path="listar" element={<ListarImovel />} />
-            <Route path="editar/:id" element={<EditarImovel />} />
+          <Route path="/dashboard" element={<PrivateRoute />}>
+            <Route element={<DashboardLayout />}>
+              <Route path="criar" element={<CriarImovel />} />
+              <Route path="listar" element={<ListarImovel />} />
+              <Route path="editar/:id?" element={<EditarImovel />} />
+              <Route path="config" element={<ConfigImobiliaria />} />
+            </Route>
           </Route>
         </Routes>
       </Router>
