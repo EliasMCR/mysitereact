@@ -1,56 +1,70 @@
 import { useState, useEffect, useMemo } from "react";
+import { useEnderecos } from "../hooks/dashboard/useEnderecos";
 
 export const FormImovel = ({ imovel = {}, onSubmit }) => {
   // Memoiza os valores iniciais para evitar recriação desnecessária
-  console.log("Imovel no form:", JSON.stringify(imovel, null, 2));
-  const initialFormData = useMemo(() => ({
-    tipoTransacao: imovel.tipoTransacao || "ALUGUEL",
-    tipoImovel: imovel.tipoImovel || "",
-    valor: imovel.valor ?? "",
-    titulo: imovel.titulo || "",
-    estadoId: imovel.endereco.estadoId || "",
-    cidadeId: imovel.endereco.cidadeId || "",
-    bairroId: imovel.endereco.bairroId || "",
-    vilaId: imovel.endereco.vilaId || "",
-    rua: imovel.endereco.rua || "",
-    numero: imovel.endereco.numero ?? "",
-    cep: imovel.endereco.cep || "",
-    quarto: imovel.quarto ?? 0,
-    banheiro: imovel.banheiro ?? 0,
-    garagem: imovel.garagem ?? 0,
-    suite: imovel.suite ?? 0,
-    area: imovel.area ?? "",
-    disponivel: imovel.disponivel ?? true,
-    imovelDestaque: imovel.imovelDestaque ?? false,
-    churrasqueira: imovel.churrasqueira ?? false,
-    lavanderia: imovel.lavanderia ?? false,
-    aceitaPet: imovel.aceitaPet ?? false,
-    descricao: imovel.descricao || "",
-  }), [
-    // Dependências específicas ao invés do objeto inteiro
-    imovel.tipoTransacao,
-    imovel.tipoImovel,
-    imovel.valor,
-    imovel.titulo,
-    imovel.endereco.estadoId,
-    imovel.enderecocidadeId,
-    imovel.enderecobairroId,
-    imovel.endereco.vilaId,
-    imovel.endereco.rua,
-    imovel.endereco.numero,
-    imovel.endereco.cep,
-    imovel.quarto,
-    imovel.banheiro,
-    imovel.garagem,
-    imovel.suite,
-    imovel.area,
-    imovel.disponivel,
-    imovel.imovelDestaque,
-    imovel.churrasqueira,
-    imovel.lavanderia,
-    imovel.aceitaPet,
-    imovel.descricao,
-  ]);
+
+  const {
+    estados,
+    cidades,
+    bairros,
+    vilas,
+    loadCidades,
+    loadBairros,
+    loadVilas,
+  } = useEnderecos();
+
+  const initialFormData = useMemo(
+    () => ({
+      tipoTransacao: imovel.tipoTransacao || "ALUGUEL",
+      tipoImovel: imovel.tipoImovel || "",
+      valor: imovel.valor ?? "",
+      titulo: imovel.titulo || "",
+      estadoId: imovel.endereco.estadoId || "",
+      cidadeId: imovel.endereco.cidadeId || "",
+      bairroId: imovel.endereco.bairroId || "",
+      vilaId: imovel.endereco.vilaId || "",
+      rua: imovel.endereco.rua || "",
+      numero: imovel.endereco.numero ?? "",
+      cep: imovel.endereco.cep || "",
+      quarto: imovel.quarto ?? 0,
+      banheiro: imovel.banheiro ?? 0,
+      garagem: imovel.garagem ?? 0,
+      suite: imovel.suite ?? 0,
+      area: imovel.area ?? "",
+      disponivel: imovel.disponivel ?? true,
+      imovelDestaque: imovel.imovelDestaque ?? false,
+      churrasqueira: imovel.churrasqueira ?? false,
+      lavanderia: imovel.lavanderia ?? false,
+      aceitaPet: imovel.aceitaPet ?? false,
+      descricao: imovel.descricao || "",
+    }),
+    [
+      // Dependências específicas ao invés do objeto inteiro
+      imovel.tipoTransacao,
+      imovel.tipoImovel,
+      imovel.valor,
+      imovel.titulo,
+      imovel.endereco.estadoId,
+      imovel.enderecocidadeId,
+      imovel.enderecobairroId,
+      imovel.endereco.vilaId,
+      imovel.endereco.rua,
+      imovel.endereco.numero,
+      imovel.endereco.cep,
+      imovel.quarto,
+      imovel.banheiro,
+      imovel.garagem,
+      imovel.suite,
+      imovel.area,
+      imovel.disponivel,
+      imovel.imovelDestaque,
+      imovel.churrasqueira,
+      imovel.lavanderia,
+      imovel.aceitaPet,
+      imovel.descricao,
+    ]
+  );
 
   const [formData, setFormData] = useState(initialFormData);
   const [files, setFiles] = useState([]);
@@ -71,15 +85,27 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
     };
   }, [files]);
 
-  const handleChange = (e) => {
-    const { name, type, checked, value: rawValue } = e.target;
-    let value;
+  const handleChange = async (e) => {
+    const { name, value, type, checked } = e.target;
+    let val = type === "checkbox" ? checked : value;
 
-    if (type === "checkbox") value = checked;
-    else if (type === "number") value = rawValue === "" ? "" : Number(rawValue);
-    else value = rawValue;
+    setFormData((prev) => ({ ...prev, [name]: val }));
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "estadoId") {
+      setFormData((prev) => ({
+        ...prev,
+        cidadeId: "",
+        bairroId: "",
+        vilaId: "",
+      }));
+      if (val) await loadCidades(val);
+    } else if (name === "cidadeId") {
+      setFormData((prev) => ({ ...prev, bairroId: "", vilaId: "" }));
+      if (val) await loadBairros(val);
+    } else if (name === "bairroId") {
+      setFormData((prev) => ({ ...prev, vilaId: "" }));
+      if (val) await loadVilas(val);
+    }
   };
 
   const handleFileChange = (e) => {
