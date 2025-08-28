@@ -37,7 +37,7 @@ export const ListarImovel = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center ">
         <span className="text-lg text-gray-600 animate-pulse">
           Carregando imóveis...
         </span>
@@ -54,7 +54,7 @@ export const ListarImovel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {imoveis.length > 0 ? (
         <Card imoveis={imoveis} />
       ) : (
