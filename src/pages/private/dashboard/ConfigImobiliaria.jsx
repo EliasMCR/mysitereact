@@ -8,28 +8,31 @@ import { SecaoAreaAtuacao } from "../../../components/dashboard/SecaoAreaAtuacao
 import { getChangedFields } from "../../../components/utils/dashboard/getChangedFields";
 
 export const ConfigImobiliaria = () => {
-  const { 
-    imobiliaria, 
-    loading, 
-    originalData, 
-    formData, 
-    updateFormData, 
-    setOriginalData 
+  const {
+    imobiliaria,
+    loading,
+    originalData,
+    formData,
+    updateFormData,
+    setOriginalData,
   } = useImobiliariaData();
-  
-  const { 
-    estados, 
-    cidades, 
-    bairros, 
+
+  const {
+    estados,
+    cidades,
+    bairros,
     vilas,
     loadCidades,
     loadBairros,
     loadVilas,
     setCidades,
     setBairros,
-    setVilas
+    setVilas,
   } = useEnderecos();
 
+  const estadoLocalStorage = imobiliaria?.estado || [];
+  const cidadeLocalStorage = imobiliaria?.cidade || [];
+  
   const [secoesAbertas, setSecoesAbertas] = useState({
     endereco: false,
     senha: false,
@@ -127,7 +130,7 @@ export const ConfigImobiliaria = () => {
     try {
       const token = localStorage.getItem("token");
       const imobiliariaId = localStorage.getItem("imobiliariaId");
-      
+
       const res = await fetch(`${BASE_URL}/imobiliaria/update`, {
         method: "PUT",
         headers: {
@@ -190,6 +193,8 @@ export const ConfigImobiliaria = () => {
           <SecaoAreaAtuacao
             isOpen={secoesAbertas.areaAtuacao}
             onToggle={() => toggleSecao("areaAtuacao")}
+            estadoLocal={estadoLocalStorage}
+            cidadeLocal={cidadeLocalStorage}
           />
         </div>
 
