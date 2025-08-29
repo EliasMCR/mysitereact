@@ -1,6 +1,6 @@
 // hooks/useImobiliariaData.js
-import { useState, useEffect } from 'react';
-import { BASE_URL } from '../../../config';
+import { useState, useEffect } from "react";
+import { BASE_URL } from "../../../config";
 
 export const useImobiliariaData = () => {
   const [imobiliaria, setImobiliaria] = useState(null);
@@ -8,6 +8,7 @@ export const useImobiliariaData = () => {
   const [originalData, setOriginalData] = useState({});
 
   const [formData, setFormData] = useState({
+    id: "",
     nome: "",
     cnpj: "",
     email: "",
@@ -23,6 +24,8 @@ export const useImobiliariaData = () => {
     cep: "",
     estadoId: "",
     plano: "",
+    estados: [], // array completo de estados
+    cidades: [], // array completo de cidades
   });
 
   useEffect(() => {
@@ -31,12 +34,15 @@ export const useImobiliariaData = () => {
       if (!imobiliariaId) return;
 
       try {
-        const res = await fetch(`${BASE_URL}/imobiliaria/info?id=${imobiliariaId}`);
+        const res = await fetch(
+          `${BASE_URL}/imobiliaria/info?id=${imobiliariaId}`
+        );
         if (!res.ok) throw new Error("Erro ao buscar imobiliária");
         const data = await res.json();
         setImobiliaria(data);
 
         const normalizedData = {
+          id: data.id || "",
           nome: data.nome || "",
           cnpj: data.cnpj || "",
           email: data.email || "",
@@ -52,10 +58,15 @@ export const useImobiliariaData = () => {
           cep: data.endereco?.cep || "",
           estadoId: data.endereco?.estadoId || "",
           plano: data.plano || "",
+          estados: data.estado || [], // array de estados do backend
+          cidades: data.cidade || [], // array de cidades do backend
         };
 
         setOriginalData(normalizedData);
         setFormData(normalizedData);
+
+        // salva no localStorage para usar em outros componentes
+        localStorage.setItem("imobiliariaData", JSON.stringify(normalizedData));
       } catch (err) {
         console.error(err);
       } finally {
@@ -67,7 +78,7 @@ export const useImobiliariaData = () => {
   }, []);
 
   const updateFormData = (updates) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   return {
@@ -76,6 +87,6 @@ export const useImobiliariaData = () => {
     originalData,
     formData,
     updateFormData,
-    setOriginalData
+    setOriginalData,
   };
 };

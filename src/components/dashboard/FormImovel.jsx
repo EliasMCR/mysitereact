@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { useEnderecos } from "../hooks/dashboard/useEnderecos";
 
 export const FormImovel = ({ imovel = {}, onSubmit }) => {
+  const imobiliaria = JSON.parse(localStorage.getItem("imobiliariaData")) || [];
+  const estadosLocalStorage = imobiliaria.estado || [];
+
   const {
     estados,
     cidades,
@@ -283,11 +286,15 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             >
               <option value="">-- selecione --</option>
-              {estados.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.name}
-                </option>
-              ))}
+              {(estadosLocalStorage && estadosLocalStorage.length > 0
+                ? estadosLocalStorage
+                : estados
+              ) // array alternativo caso estadosLocalStorage não exista
+                .map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.name}
+                  </option>
+                ))}
             </select>
 
             <label className="mb-1 mt-3">

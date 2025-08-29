@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 export const Card = ({ imoveis }) => {
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 p-2">
-      {imoveis.map((imovel) => (
+      {imoveis.map((imovel, index) => (
         <div
-          key={imovel.id}
+          key={`${imovel.id}-${index}`}
           className="flex flex-col bg-white rounded-xl shadow-md overflow-hidden text-blue-500"
         >
           {/* Header do card */}
