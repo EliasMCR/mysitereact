@@ -2,8 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useEnderecos } from "../hooks/dashboard/useEnderecos";
 
 export const FormImovel = ({ imovel = {}, onSubmit }) => {
-  // Memoiza os valores iniciais para evitar recriação desnecessária
-
   const {
     estados,
     cidades,
@@ -16,53 +14,64 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
 
   const initialFormData = useMemo(
     () => ({
-      tipoTransacao: imovel.tipoTransacao || "ALUGUEL",
-      tipoImovel: imovel.tipoImovel || "",
-      valor: imovel.valor ?? "",
-      titulo: imovel.titulo || "",
-      estadoId: imovel.endereco.estadoId || "",
-      cidadeId: imovel.endereco.cidadeId || "",
-      bairroId: imovel.endereco.bairroId || "",
-      vilaId: imovel.endereco.vilaId || "",
-      rua: imovel.endereco.rua || "",
-      numero: imovel.endereco.numero ?? "",
-      cep: imovel.endereco.cep || "",
-      quarto: imovel.quarto ?? 0,
-      banheiro: imovel.banheiro ?? 0,
-      garagem: imovel.garagem ?? 0,
+      // Campos do DTO
+      imovelId: imovel.imovelId || null,
+      area: imovel.area ?? 99.0,
+      titulo: imovel.titulo || "teste",
+      valor: imovel.valor ?? 99.0,
+      banheiro: imovel.banheiro ?? 1,
+      quarto: imovel.quarto ?? 2,
       suite: imovel.suite ?? 0,
-      area: imovel.area ?? "",
-      disponivel: imovel.disponivel ?? true,
-      imovelDestaque: imovel.imovelDestaque ?? false,
-      churrasqueira: imovel.churrasqueira ?? false,
+      garagem: imovel.garagem ?? 0,
       lavanderia: imovel.lavanderia ?? false,
-      aceitaPet: imovel.aceitaPet ?? false,
-      descricao: imovel.descricao || "",
+      churrasqueira: imovel.churrasqueira ?? false,
+      disponivel: imovel.disponivel ?? true,
+      aceitaPet: imovel.aceitaPet ?? true,
+      tipoImovel: imovel.tipoImovel || "CASA",
+      tipoTransacao: imovel.tipoTransacao || "ALUGUEL",
+      imovelDestaque: imovel.imovelDestaque ?? false,
+      descricao: imovel.descricao || "TESTE",
+
+      // Endereço - campos diretos no DTO
+      rua: imovel.rua || imovel.endereco?.rua || "",
+      numero: imovel.numero || imovel.endereco?.numero || "",
+      bairroId: imovel.bairroId || imovel.endereco?.bairroId || null,
+      vilaId: imovel.vilaId || imovel.endereco?.vilaId || null,
+      cidadeId: imovel.cidadeId || imovel.endereco?.cidadeId || null,
+      estadoId: imovel.estadoId || imovel.endereco?.estadoId || null,
+      cep: imovel.cep || imovel.endereco?.cep || "",
     }),
     [
-      // Dependências específicas ao invés do objeto inteiro
-      imovel.tipoTransacao,
-      imovel.tipoImovel,
-      imovel.valor,
-      imovel.titulo,
-      imovel.endereco.estadoId,
-      imovel.enderecocidadeId,
-      imovel.enderecobairroId,
-      imovel.endereco.vilaId,
-      imovel.endereco.rua,
-      imovel.endereco.numero,
-      imovel.endereco.cep,
-      imovel.quarto,
-      imovel.banheiro,
-      imovel.garagem,
-      imovel.suite,
+      imovel.imovelId,
       imovel.area,
-      imovel.disponivel,
-      imovel.imovelDestaque,
-      imovel.churrasqueira,
+      imovel.titulo,
+      imovel.valor,
+      imovel.banheiro,
+      imovel.quarto,
+      imovel.suite,
+      imovel.garagem,
       imovel.lavanderia,
+      imovel.churrasqueira,
+      imovel.disponivel,
       imovel.aceitaPet,
+      imovel.tipoImovel,
+      imovel.tipoTransacao,
+      imovel.imovelDestaque,
       imovel.descricao,
+      imovel.rua,
+      imovel.numero,
+      imovel.bairroId,
+      imovel.vilaId,
+      imovel.cidadeId,
+      imovel.estadoId,
+      imovel.cep,
+      imovel.endereco?.rua,
+      imovel.endereco?.numero,
+      imovel.endereco?.bairroId,
+      imovel.endereco?.vilaId,
+      imovel.endereco?.cidadeId,
+      imovel.endereco?.estadoId,
+      imovel.endereco?.cep,
     ]
   );
 
@@ -85,25 +94,42 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
     };
   }, [files]);
 
+  // carrega cidades se estadoId mudar (edicao)
+  useEffect(() => {
+    if (formData.estadoId) {
+      loadCidades(formData.estadoId);
+    }
+  }, [formData.estadoId]);
+
   const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
-    let val = type === "checkbox" ? checked : value;
+    let val;
+
+    if (type === "checkbox") {
+      val = checked;
+    } else if (type === "number") {
+      // Para campos numéricos, converte para null se vazio
+      val = value === "" ? null : Number(value);
+    } else {
+      val = value;
+    }
 
     setFormData((prev) => ({ ...prev, [name]: val }));
 
+    // lógica de carregamento dependente de selects
     if (name === "estadoId") {
       setFormData((prev) => ({
         ...prev,
-        cidadeId: "",
-        bairroId: "",
-        vilaId: "",
+        cidadeId: null,
+        bairroId: null,
+        vilaId: null,
       }));
       if (val) await loadCidades(val);
     } else if (name === "cidadeId") {
-      setFormData((prev) => ({ ...prev, bairroId: "", vilaId: "" }));
+      setFormData((prev) => ({ ...prev, bairroId: null, vilaId: null }));
       if (val) await loadBairros(val);
     } else if (name === "bairroId") {
-      setFormData((prev) => ({ ...prev, vilaId: "" }));
+      setFormData((prev) => ({ ...prev, vilaId: null }));
       if (val) await loadVilas(val);
     }
   };
@@ -115,20 +141,49 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const data = new FormData();
+    // Prepara os dados conforme o DTO esperado
+    const dtoData = {
+      // Se for edição, inclui o ID
+      ...(formData.imovelId && { imovelId: formData.imovelId }),
 
-    // append fields (converte boolean/number para string)
-    Object.keys(formData).forEach((key) => {
-      const val = formData[key];
-      data.append(key, val === undefined || val === null ? "" : String(val));
-    });
+      // Campos obrigatórios com valores padrão
+      area: formData.area || 1.0, // Double não pode ser null se obrigatório
+      titulo: formData.titulo,
+      valor: formData.valor || 0, // BigDecimal
+      banheiro: formData.banheiro || 0,
+      quarto: formData.quarto || 0,
+      suite: formData.suite || 0,
+      garagem: formData.garagem || 0,
 
-    // arquivos
-    files.forEach((file) => data.append("listaImagens", file));
+      // Booleanos
+      lavanderia: Boolean(formData.lavanderia),
+      churrasqueira: Boolean(formData.churrasqueira),
+      disponivel: Boolean(formData.disponivel),
+      aceitaPet: Boolean(formData.aceitaPet),
+      imovelDestaque: Boolean(formData.imovelDestaque),
 
-    if (onSubmit) {
-      onSubmit(data);
-    }
+      // Strings
+      tipoImovel: formData.tipoImovel,
+      tipoTransacao: formData.tipoTransacao,
+      descricao: formData.descricao,
+
+      // Endereço - campos diretos no DTO
+      rua: formData.rua,
+      numero: formData.numero,
+      bairroId: formData.bairroId,
+      vilaId: formData.vilaId,
+      cidadeId: formData.cidadeId,
+      estadoId: formData.estadoId,
+      cep: formData.cep,
+    };
+
+    // Adiciona os arquivos separadamente para o componente pai tratar
+    const finalData = {
+      ...dtoData,
+      files, // Para o componente pai processar as imagens
+    };
+
+    if (onSubmit) onSubmit(finalData);
   };
 
   return (
@@ -188,8 +243,9 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
           </label>
           <input
             type="number"
+            step="0.01"
             name="valor"
-            value={formData.valor}
+            value={formData.valor || ""}
             onChange={handleChange}
             placeholder="0.00"
             className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
@@ -220,15 +276,18 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
               Estado <span className="text-red-500">*</span>
             </label>
             <select
-              name="estado"
-              id="estado"
-              value={formData.estado}
+              name="estadoId"
+              value={formData.estadoId || ""}
               onChange={handleChange}
               required
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             >
               <option value="">-- selecione --</option>
-              {/* preencha com estados conforme sua fonte */}
+              {estados.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.name}
+                </option>
+              ))}
             </select>
 
             <label className="mb-1 mt-3">
@@ -236,13 +295,17 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
             </label>
             <select
               name="cidadeId"
-              id="cidadeId"
-              value={formData.cidadeId}
+              value={formData.cidadeId || ""}
               onChange={handleChange}
               required
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             >
               <option value="">-- selecione --</option>
+              {cidades.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
+              ))}
             </select>
 
             <label className="mb-1 mt-3">
@@ -250,29 +313,34 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
             </label>
             <select
               name="bairroId"
-              id="bairro"
-              value={formData.bairroId}
+              value={formData.bairroId || ""}
               onChange={handleChange}
               required
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             >
               <option value="">-- selecione --</option>
+              {bairros.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.nome}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="flex flex-col">
-            <label className="mb-1">
-              Vila <span className="text-red-500">*</span>
-            </label>
+            <label className="mb-1">Vila</label>
             <select
               name="vilaId"
-              id="vila"
-              value={formData.vilaId}
+              value={formData.vilaId || ""}
               onChange={handleChange}
-              required
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             >
               <option value="">-- selecione --</option>
+              {vilas.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.nome}
+                </option>
+              ))}
             </select>
 
             <label className="mb-1 mt-3">
@@ -291,7 +359,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
               Número <span className="text-red-500">*</span>
             </label>
             <input
-              type="number"
+              type="text"
               name="numero"
               value={formData.numero}
               onChange={handleChange}
@@ -315,8 +383,9 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
             </label>
             <input
               type="number"
+              step="0.01"
               name="area"
-              value={formData.area}
+              value={formData.area || ""}
               onChange={handleChange}
               required
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
@@ -336,7 +405,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
             <input
               type="number"
               name="quarto"
-              value={formData.quarto}
+              value={formData.quarto || ""}
               onChange={handleChange}
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             />
@@ -345,7 +414,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
             <input
               type="number"
               name="banheiro"
-              value={formData.banheiro}
+              value={formData.banheiro || ""}
               onChange={handleChange}
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             />
@@ -354,7 +423,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
             <input
               type="number"
               name="garagem"
-              value={formData.garagem}
+              value={formData.garagem || ""}
               onChange={handleChange}
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             />
@@ -365,7 +434,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
             <input
               type="number"
               name="suite"
-              value={formData.suite}
+              value={formData.suite || ""}
               onChange={handleChange}
               className="border border-gray-400 hover:border-blue-500 rounded p-2"
             />
@@ -489,7 +558,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
         >
-          {imovel?.id ? "Atualizar Imóvel" : "Postar Imóvel"}
+          {formData.imovelId ? "Atualizar Imóvel" : "Postar Imóvel"}
         </button>
       </div>
     </form>
