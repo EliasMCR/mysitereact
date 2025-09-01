@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FormImovel } from "./FormImovel";
 import { BASE_URL } from "../../config";
+import { FormImovelUpdate } from "./FormImovelUpdate";
 
 export const Search = ({ imovel: imovelProp = null }) => {
   const [imovel, setImovel] = useState(imovelProp);
@@ -86,7 +87,7 @@ export const Search = ({ imovel: imovelProp = null }) => {
 
       <div className="mt-6">
         {shouldShowForm ? (
-          <FormImovel imovel={imovel} />
+          <FormImovelUpdate imovel={imovel} />
         ) : (
           <div className="bg-white p-6 rounded-lg shadow text-center text-gray-500">
             <p>Pesquise por um imóvel para visualizar o formulário</p>
