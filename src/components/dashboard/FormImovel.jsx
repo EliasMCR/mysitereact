@@ -1,11 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useEnderecos } from "../hooks/dashboard/useEnderecos";
-import { useParams } from "react-router-dom";
 
-export const FormImovel = ({ imovel = {}, onSubmit }) => {
+export const FormImovel = ({ onSubmit }) => {
   const imobiliaria = JSON.parse(localStorage.getItem("imobiliariaData")) || [];
   const estadosLocalStorage = imobiliaria.estado || [];
-  const {id} = useParams() || null;
 
   const {
     estados,
@@ -17,79 +15,36 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
     loadVilas,
   } = useEnderecos();
 
-  const initialFormData = useMemo(
-    () => ({
-      // Campos do DTO
-      imovelId: imovel.imovelId || null,
-      area: imovel.area ?? 99.0,
-      titulo: imovel.titulo || "teste",
-      valor: imovel.valor ?? 99.0,
-      banheiro: imovel.banheiro ?? 1,
-      quarto: imovel.quarto ?? 2,
-      suite: imovel.suite ?? 0,
-      garagem: imovel.garagem ?? 0,
-      lavanderia: imovel.lavanderia ?? false,
-      churrasqueira: imovel.churrasqueira ?? false,
-      disponivel: imovel.disponivel ?? true,
-      aceitaPet: imovel.aceitaPet ?? true,
-      tipoImovel: imovel.tipoImovel || "CASA",
-      tipoTransacao: imovel.tipoTransacao || "ALUGUEL",
-      imovelDestaque: imovel.imovelDestaque ?? false,
-      descricao: imovel.descricao || "TESTE",
-
-      // Endereço - campos diretos no DTO
-      rua: imovel.rua || imovel.endereco?.rua || "",
-      numero: imovel.numero || imovel.endereco?.numero || "",
-      bairroId: imovel.bairroId || imovel.endereco?.bairroId || null,
-      vilaId: imovel.vilaId || imovel.endereco?.vilaId || null,
-      cidadeId: imovel.cidadeId || imovel.endereco?.cidadeId || null,
-      estadoId: imovel.estadoId || imovel.endereco?.estadoId || null,
-      cep: imovel.cep || imovel.endereco?.cep || "989000",
-    }),
-    [
-      imovel.imovelId,
-      imovel.area,
-      imovel.titulo,
-      imovel.valor,
-      imovel.banheiro,
-      imovel.quarto,
-      imovel.suite,
-      imovel.garagem,
-      imovel.lavanderia,
-      imovel.churrasqueira,
-      imovel.disponivel,
-      imovel.aceitaPet,
-      imovel.tipoImovel,
-      imovel.tipoTransacao,
-      imovel.imovelDestaque,
-      imovel.descricao,
-      imovel.rua,
-      imovel.numero,
-      imovel.bairroId,
-      imovel.vilaId,
-      imovel.cidadeId,
-      imovel.estadoId,
-      imovel.cep,
-      imovel.endereco?.rua,
-      imovel.endereco?.numero,
-      imovel.endereco?.bairroId,
-      imovel.endereco?.vilaId,
-      imovel.endereco?.cidadeId,
-      imovel.endereco?.estadoId,
-      imovel.endereco?.cep,
-    ]
-  );
+  const initialFormData = {
+    area: 99.0,
+    titulo: "",
+    valor: 0,
+    banheiro: 1,
+    quarto: 2,
+    suite: 0,
+    garagem: 0,
+    lavanderia: false,
+    churrasqueira: false,
+    disponivel: true,
+    aceitaPet: true,
+    tipoImovel: "CASA",
+    tipoTransacao: "ALUGUEL",
+    imovelDestaque: false,
+    descricao: "",
+    rua: "",
+    numero: "",
+    bairroId: null,
+    vilaId: null,
+    cidadeId: null,
+    estadoId: null,
+    cep: "",
+  };
 
   const [formData, setFormData] = useState(initialFormData);
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
 
-  // Atualiza apenas quando os valores iniciais realmente mudarem
-  useEffect(() => {
-    setFormData(initialFormData);
-  }, [initialFormData]);
-
-  // cria previews quando files mudam
+  // Cria previews quando files mudam
   useEffect(() => {
     const urls = files.map((f) => URL.createObjectURL(f));
     setPreviews(urls);
@@ -99,13 +54,6 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
     };
   }, [files]);
 
-  // carrega cidades se estadoId mudar (edicao)
-  useEffect(() => {
-    if (formData.estadoId) {
-      loadCidades(formData.estadoId);
-    }
-  }, [formData.estadoId]);
-
   const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
     let val;
@@ -113,7 +61,6 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
     if (type === "checkbox") {
       val = checked;
     } else if (type === "number") {
-      // Para campos numéricos, converte para null se vazio
       val = value === "" ? null : Number(value);
     } else {
       val = value;
@@ -121,7 +68,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
 
     setFormData((prev) => ({ ...prev, [name]: val }));
 
-    // lógica de carregamento dependente de selects
+    // Lógica de carregamento dependente de selects
     if (name === "estadoId") {
       setFormData((prev) => ({
         ...prev,
@@ -140,39 +87,33 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
   };
 
   const handleFileChange = (e) => {
-    setFiles([...e.target.files]);
+    const newFiles = [...e.target.files];
+    setFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  const removeImage = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Prepara os dados conforme o DTO esperado
     const dtoData = {
-      // Se for edição, inclui o ID
-      ...(formData.imovelId && { imovelId: formData.imovelId }),
-
-      // Campos obrigatórios com valores padrão
-      area: formData.area || 1.0, // Double não pode ser null se obrigatório
+      area: formData.area || 1.0,
       titulo: formData.titulo,
-      valor: formData.valor || 0, // BigDecimal
+      valor: formData.valor || 0,
       banheiro: formData.banheiro || 0,
       quarto: formData.quarto || 0,
       suite: formData.suite || 0,
       garagem: formData.garagem || 0,
-
-      // Booleanos
       lavanderia: Boolean(formData.lavanderia),
       churrasqueira: Boolean(formData.churrasqueira),
       disponivel: Boolean(formData.disponivel),
       aceitaPet: Boolean(formData.aceitaPet),
       imovelDestaque: Boolean(formData.imovelDestaque),
-
-      // Strings
       tipoImovel: formData.tipoImovel,
       tipoTransacao: formData.tipoTransacao,
       descricao: formData.descricao,
-
-      // Endereço - campos diretos no DTO
       rua: formData.rua,
       numero: formData.numero,
       bairroId: formData.bairroId,
@@ -182,10 +123,9 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
       cep: formData.cep,
     };
 
-    // Adiciona os arquivos separadamente para o componente pai tratar
     const finalData = {
       ...dtoData,
-      files, // Para o componente pai processar as imagens
+      files,
     };
 
     if (onSubmit) onSubmit(finalData);
@@ -291,12 +231,11 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
               {(estadosLocalStorage && estadosLocalStorage.length > 0
                 ? estadosLocalStorage
                 : estados
-              ) // array alternativo caso estadosLocalStorage não exista
-                .map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.name}
-                  </option>
-                ))}
+              ).map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.name}
+                </option>
+              ))}
             </select>
 
             <label className="mb-1 mt-3">
@@ -527,7 +466,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
       <section>
         <label
           htmlFor="fileInput"
-          className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 text-center cursor-pointer"
+          className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-blue-500"
         >
           <span className="material-symbols-outlined text-3xl">
             photo_camera
@@ -546,16 +485,24 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
           className="hidden"
         />
 
-        {/* previews */}
+        {/* Previews com botão de remoção */}
         {previews.length > 0 && (
           <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-2">
             {previews.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                alt={`preview-${i}`}
-                className="w-full h-24 object-cover rounded"
-              />
+              <div key={i} className="relative group">
+                <img
+                  src={src}
+                  alt={`preview-${i}`}
+                  className="w-full h-24 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -565,9 +512,9 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
       <div className="flex justify-center">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer"
         >
-          {id ? "Atualizar Imóvel" : "Postar Imóvel"}
+          Criar Imóvel
         </button>
       </div>
     </form>
