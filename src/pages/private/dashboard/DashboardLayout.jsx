@@ -7,7 +7,7 @@ export const DashboardLayout = () => {
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <HeaderDash />
       {/* Aqui é onde as rotas filhas serão renderizadas */}
-      <main className="flex-1 mt-20 mb-20">
+      <main className="flex-1 mt-24 mb-24 ">
         <Outlet />
       </main>
 

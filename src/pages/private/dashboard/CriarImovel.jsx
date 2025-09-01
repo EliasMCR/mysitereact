@@ -82,14 +82,17 @@ export const CriarImovel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white relative">
+    <div className="min-h-screen bg-gray-100 relative">
       {loading && (
         <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-50">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
         </div>
       )}
-      <p className="p-4 text-4xl text-gray-700">Novo imóvel</p>
-      <FormImovel onSubmit={criarImovel} />
+      
+      <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4">
+        <p className="p-4 text-4xl text-gray-500">Novo imóvel</p>
+        <FormImovel onSubmit={criarImovel} />
+      </div>
     </div>
   );
 };

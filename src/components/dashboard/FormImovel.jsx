@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useEnderecos } from "../hooks/dashboard/useEnderecos";
+import { useParams } from "react-router-dom";
 
 export const FormImovel = ({ imovel = {}, onSubmit }) => {
   const imobiliaria = JSON.parse(localStorage.getItem("imobiliariaData")) || [];
   const estadosLocalStorage = imobiliaria.estado || [];
+  const {id} = useParams() || null;
 
   const {
     estados,
@@ -42,7 +44,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
       vilaId: imovel.vilaId || imovel.endereco?.vilaId || null,
       cidadeId: imovel.cidadeId || imovel.endereco?.cidadeId || null,
       estadoId: imovel.estadoId || imovel.endereco?.estadoId || null,
-      cep: imovel.cep || imovel.endereco?.cep || "",
+      cep: imovel.cep || imovel.endereco?.cep || "989000",
     }),
     [
       imovel.imovelId,
@@ -565,7 +567,7 @@ export const FormImovel = ({ imovel = {}, onSubmit }) => {
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
         >
-          {formData.imovelId ? "Atualizar Imóvel" : "Postar Imóvel"}
+          {id ? "Atualizar Imóvel" : "Postar Imóvel"}
         </button>
       </div>
     </form>

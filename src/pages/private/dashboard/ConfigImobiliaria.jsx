@@ -169,7 +169,7 @@ export const ConfigImobiliaria = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2">
+    <div className="min-h-screen bg-gray-100 p-2">
       <form
         onSubmit={handleSubmit}
         className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4"

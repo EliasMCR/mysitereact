@@ -17,7 +17,7 @@ export const ListarImovel = () => {
       if (!imobiliariaId) throw new Error("Usuário não autenticado");
 
       const res = await fetch(
-        `${BASE_URL}/imoveis/listar?idImobiliaria=${imobiliariaId}&page=${currentPage}&size=${size}&sort=valor,asc`
+        `${BASE_URL}/imoveis/listar?idImobiliaria=${imobiliariaId}&page=${currentPage}&size=${size}&sort=id,asc`
       );
 
       if (!res.ok) {
@@ -29,9 +29,15 @@ export const ListarImovel = () => {
       const data = await res.json();
       const novosImoveis = data.content || data;
 
-      // atualiza lista e verifica se tem mais páginas
-      setImoveis((prev) => [...prev, ...novosImoveis]);
-      setHasMore(novosImoveis.length === size); // se veio menos que o tamanho da página, acabou
+      // Mescla evitando duplicados (garantindo imóveis únicos por ID)
+      setImoveis((prev) => {
+        const map = new Map();
+        [...prev, ...novosImoveis].forEach((item) => map.set(item.id, item));
+        return Array.from(map.values());
+      });
+
+      // Atualiza flag de mais páginas
+      setHasMore(novosImoveis.length === size);
       setPage((prev) => prev + 1);
     } catch (err) {
       setError(err.message);
@@ -53,7 +59,7 @@ export const ListarImovel = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 bg-white">
+    <div className="min-h-screen p-4 bg-gray-100">
       {imoveis.length > 0 ? (
         <Card imoveis={imoveis} />
       ) : (
