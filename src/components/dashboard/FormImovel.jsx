@@ -16,18 +16,18 @@ export const FormImovel = ({ onSubmit }) => {
   } = useEnderecos();
 
   const initialFormData = {
-    area: 99.0,
+    area: null,
     titulo: "",
-    valor: 0,
-    banheiro: 1,
-    quarto: 2,
+    valor: null,
+    banheiro: 0,
+    quarto: 0,
     suite: 0,
     garagem: 0,
     lavanderia: false,
     churrasqueira: false,
     disponivel: true,
     aceitaPet: true,
-    tipoImovel: "CASA",
+    tipoImovel: "",
     tipoTransacao: "ALUGUEL",
     imovelDestaque: false,
     descricao: "",
@@ -53,6 +53,17 @@ export const FormImovel = ({ onSubmit }) => {
       urls.forEach((u) => URL.revokeObjectURL(u));
     };
   }, [files]);
+
+  // Função auxiliar para classes de borda dinâmicas
+  const getInputClass = (fieldName) => {
+    const baseClasses =
+      "border hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200 w-full";
+    const value = formData[fieldName];
+    // Um valor é válido se não for nulo, indefinido ou uma string vazia.
+    // O número 0 é considerado um valor válido aqui (ex: 0 garagens).
+    const isValid = value !== null && value !== undefined && value !== "";
+    return `${baseClasses} ${isValid ? "border-green-500" : "border-gray-400"}`;
+  };
 
   const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
@@ -99,8 +110,8 @@ export const FormImovel = ({ onSubmit }) => {
     e.preventDefault();
 
     const dtoData = {
+      ...formData, // Espalha os valores atuais do formulário
       area: formData.area || 1.0,
-      titulo: formData.titulo,
       valor: formData.valor || 0,
       banheiro: formData.banheiro || 0,
       quarto: formData.quarto || 0,
@@ -111,16 +122,6 @@ export const FormImovel = ({ onSubmit }) => {
       disponivel: Boolean(formData.disponivel),
       aceitaPet: Boolean(formData.aceitaPet),
       imovelDestaque: Boolean(formData.imovelDestaque),
-      tipoImovel: formData.tipoImovel,
-      tipoTransacao: formData.tipoTransacao,
-      descricao: formData.descricao,
-      rua: formData.rua,
-      numero: formData.numero,
-      bairroId: formData.bairroId,
-      vilaId: formData.vilaId,
-      cidadeId: formData.cidadeId,
-      estadoId: formData.estadoId,
-      cep: formData.cep,
     };
 
     const finalData = {
@@ -143,7 +144,7 @@ export const FormImovel = ({ onSubmit }) => {
             name="tipoTransacao"
             value={formData.tipoTransacao}
             onChange={handleChange}
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("tipoTransacao")}
             required
           >
             <option value="ALUGUEL">Aluguel</option>
@@ -159,7 +160,7 @@ export const FormImovel = ({ onSubmit }) => {
             name="tipoImovel"
             value={formData.tipoImovel}
             onChange={handleChange}
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("tipoImovel")}
             required
           >
             <option value="">-- Selecione --</option>
@@ -193,7 +194,7 @@ export const FormImovel = ({ onSubmit }) => {
             value={formData.valor || ""}
             onChange={handleChange}
             placeholder="0.00"
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("valor")}
             required
           />
         </div>
@@ -205,7 +206,7 @@ export const FormImovel = ({ onSubmit }) => {
             name="titulo"
             value={formData.titulo}
             onChange={handleChange}
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("titulo")}
           />
         </div>
       </section>
@@ -216,7 +217,7 @@ export const FormImovel = ({ onSubmit }) => {
       <section>
         <p className="font-semibold mb-3">Endereço</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">
               Estado <span className="text-red-500">*</span>
             </label>
@@ -225,7 +226,7 @@ export const FormImovel = ({ onSubmit }) => {
               value={formData.estadoId || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("estadoId")}
             >
               <option value="">-- selecione --</option>
               {(estadosLocalStorage && estadosLocalStorage.length > 0
@@ -238,7 +239,7 @@ export const FormImovel = ({ onSubmit }) => {
               ))}
             </select>
 
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Cidade <span className="text-red-500">*</span>
             </label>
             <select
@@ -246,7 +247,7 @@ export const FormImovel = ({ onSubmit }) => {
               value={formData.cidadeId || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("cidadeId")}
             >
               <option value="">-- selecione --</option>
               {cidades.map((c) => (
@@ -256,7 +257,7 @@ export const FormImovel = ({ onSubmit }) => {
               ))}
             </select>
 
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Bairro <span className="text-red-500">*</span>
             </label>
             <select
@@ -264,7 +265,7 @@ export const FormImovel = ({ onSubmit }) => {
               value={formData.bairroId || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("bairroId")}
             >
               <option value="">-- selecione --</option>
               {bairros.map((b) => (
@@ -275,13 +276,13 @@ export const FormImovel = ({ onSubmit }) => {
             </select>
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">Vila</label>
             <select
               name="vilaId"
               value={formData.vilaId || ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("vilaId")}
             >
               <option value="">-- selecione --</option>
               {vilas.map((v) => (
@@ -291,7 +292,7 @@ export const FormImovel = ({ onSubmit }) => {
               ))}
             </select>
 
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Rua <span className="text-red-500">*</span>
             </label>
             <input
@@ -300,10 +301,10 @@ export const FormImovel = ({ onSubmit }) => {
               value={formData.rua}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("rua")}
             />
 
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Número <span className="text-red-500">*</span>
             </label>
             <input
@@ -312,21 +313,21 @@ export const FormImovel = ({ onSubmit }) => {
               value={formData.numero}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("numero")}
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">CEP</label>
             <input
               type="text"
               name="cep"
               value={formData.cep}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("cep")}
             />
 
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Área (m²) <span className="text-red-500">*</span>
             </label>
             <input
@@ -336,7 +337,7 @@ export const FormImovel = ({ onSubmit }) => {
               value={formData.area || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("area")}
             />
           </div>
         </div>
@@ -348,47 +349,47 @@ export const FormImovel = ({ onSubmit }) => {
       <section>
         <p className="font-semibold mb-3">Características</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">Quartos</label>
             <input
               type="number"
               name="quarto"
-              value={formData.quarto || ""}
+              value={formData.quarto ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("quarto")}
             />
 
-            <label className="mb-1 mt-3">Banheiros</label>
+            <label className="mb-1">Banheiros</label>
             <input
               type="number"
               name="banheiro"
-              value={formData.banheiro || ""}
+              value={formData.banheiro ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("banheiro")}
             />
 
-            <label className="mb-1 mt-3">Garagem</label>
+            <label className="mb-1">Garagem</label>
             <input
               type="number"
               name="garagem"
-              value={formData.garagem || ""}
+              value={formData.garagem ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("garagem")}
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">Suíte</label>
             <input
               type="number"
               name="suite"
-              value={formData.suite || ""}
+              value={formData.suite ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("suite")}
             />
           </div>
 
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2 pt-2">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -456,7 +457,7 @@ export const FormImovel = ({ onSubmit }) => {
           name="descricao"
           value={formData.descricao}
           onChange={handleChange}
-          className="w-full border border-gray-400 hover:border-blue-500 rounded p-3 h-32 resize-y"
+          className={`${getInputClass("descricao")} h-32 resize-y`}
         />
       </section>
 

@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
-import { FormImovel } from "./FormImovel";
 import { BASE_URL } from "../../config";
 import { FormImovelUpdate } from "./FormImovelUpdate";
 
-export const Search = ({ imovel: imovelProp = null }) => {
+export const Search = ({ imovel: imovelProp = null, onSubmit }) => {
   const [imovel, setImovel] = useState(imovelProp);
   const [idPesquisa, setIdPesquisa] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const imobiliaria = JSON.parse(localStorage.getItem("imobiliariaData")) || {};
   const idImobiliaria = imobiliaria.id || "";
 
-  // Se a prop mudar, atualiza o estado
+  // Atualiza o estado quando a prop muda
   useEffect(() => {
     setImovel(imovelProp);
   }, [imovelProp]);
@@ -27,7 +26,7 @@ export const Search = ({ imovel: imovelProp = null }) => {
       if (!response.ok) throw new Error("Imóvel não encontrado");
 
       const data = await response.json();
-      setImovel(data); // envia o resultado para o FormImovel
+      setImovel(data);
     } catch (err) {
       console.error(err);
       setImovel(null);
@@ -42,7 +41,6 @@ export const Search = ({ imovel: imovelProp = null }) => {
     setIdPesquisa("");
   };
 
-  // Determina se deve mostrar o FormImovel
   const shouldShowForm = imovel !== null;
 
   return (
@@ -72,22 +70,22 @@ export const Search = ({ imovel: imovelProp = null }) => {
             >
               {isLoading ? "Pesquisando..." : "Pesquisar"}
             </button>
-            {shouldShowForm && (
-              <button
-                className="bg-red-500 p-2 rounded text-white hover:bg-red-600 transition"
-                type="button"
-                onClick={handleCancel}
-              >
-                Cancelar
-              </button>
-            )}
+
+            <button
+              className="bg-red-500 p-2 rounded text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              type="button"
+              onClick={handleCancel}
+              disabled={!idPesquisa && !shouldShowForm}
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       </form>
 
       <div className="mt-6">
         {shouldShowForm ? (
-          <FormImovelUpdate imovel={imovel} />
+          <FormImovelUpdate imovel={imovel} onSubmit={onSubmit} />
         ) : (
           <div className="bg-white p-6 rounded-lg shadow text-center text-gray-500">
             <p>Pesquise por um imóvel para visualizar o formulário</p>

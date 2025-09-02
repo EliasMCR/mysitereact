@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export const DashboardLayout = () => {
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gray-200 flex flex-col">
       <HeaderDash />
       {/* Aqui é onde as rotas filhas serão renderizadas */}
       <main className="flex-1 mt-24 mb-24 ">

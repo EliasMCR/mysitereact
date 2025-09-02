@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { FormImovel } from "../../../components/dashboard/FormImovel";
 import { BASE_URL } from "../../../config";
+import { useSalvarImagens } from "../../../components/hooks/dashboard/useSalvarImagens";
 
 export const CriarImovel = () => {
   const [loading, setLoading] = useState(false);
+  const {
+    loading: loadingImagens,
+    error,
+    salvarImagens,
+    clearError,
+  } = useSalvarImagens();
 
   const criarImovel = async (dados) => {
     try {
@@ -21,7 +28,6 @@ export const CriarImovel = () => {
         "estadoId",
         "cidadeId",
         "bairroId",
-        "vilaId",
       ];
 
       for (const campo of obrigatorios) {
@@ -30,30 +36,8 @@ export const CriarImovel = () => {
         }
       }
 
-      let urlsImagens = [];
-
-      // 1) envia imagens em lotes de 5
-      for (let i = 0; i < arquivos.length; i += 5) {
-        const lote = arquivos.slice(i, i + 5);
-        const formData = new FormData();
-        lote.forEach((file) => formData.append("listaImg", file));
-
-        const response = await fetch(`${BASE_URL}/imoveis/uploadImg`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const erroText = await response.text();
-          throw new Error(`Erro ao enviar imagens: ${erroText}`);
-        }
-
-        const result = await response.json();
-        urlsImagens = [...urlsImagens, ...result];
-      }
+      // Usar o hook para salvar imagens
+      const urlsImagens = await salvarImagens(arquivos);
 
       // 2) envia dados do imóvel
       const responseCadastro = await fetch(`${BASE_URL}/imoveis/cadastro`, {
@@ -81,14 +65,25 @@ export const CriarImovel = () => {
     }
   };
 
+  const isLoading = loading || loadingImagens;
+
   return (
-    <div className="min-h-screen bg-gray-100 relative">
-      {loading && (
+    <div className="min-h-screen relative">
+      {isLoading && (
         <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-50">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
         </div>
       )}
-      
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+          <button onClick={clearError} className="ml-2 underline">
+            Fechar
+          </button>
+        </div>
+      )}
+
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4">
         <p className="p-4 text-4xl text-gray-500">Novo imóvel</p>
         <FormImovel onSubmit={criarImovel} />

@@ -18,7 +18,7 @@ export const LogoutButton = () => {
       className="bg-red-600 text-white px-2 py-2 rounded hover:bg-red-700 flex gap-2 cursor-pointer"
     >
       <div>Sair</div>
-      <span class="material-symbols-outlined block">exit_to_app</span>
+      <span className="material-symbols-outlined block">exit_to_app</span>
     </button>
   );
 };

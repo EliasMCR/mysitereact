@@ -59,7 +59,7 @@ export const ListarImovel = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 bg-gray-100">
+    <div className="min-h-screen p-4">
       {imoveis.length > 0 ? (
         <Card imoveis={imoveis} />
       ) : (

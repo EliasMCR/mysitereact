@@ -17,7 +17,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
 
   const initialFormData = useMemo(
     () => ({
-      // Campos básicos
       imovelId: imovel.imovelId || null,
       area: imovel.area ?? 99.0,
       titulo: imovel.titulo || "",
@@ -34,8 +33,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
       tipoTransacao: imovel.tipoTransacao || "ALUGUEL",
       imovelDestaque: imovel.imovelDestaque ?? false,
       descricao: imovel.descricao || "",
-
-      // Endereço
       rua: imovel.rua || imovel.endereco?.rua || "",
       numero: imovel.numero || imovel.endereco?.numero || "",
       bairroId: imovel.bairroId || imovel.endereco?.bairroId || null,
@@ -48,8 +45,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
   );
 
   const [formData, setFormData] = useState(initialFormData);
-
-  // Imagens existentes e remoções
   const [existingImages, setExistingImages] = useState(
     imovel.imagensImovel || []
   );
@@ -57,7 +52,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
 
-  // Sincroniza valores iniciais se o imovel mudar
   useEffect(() => {
     setFormData(initialFormData);
     setExistingImages(imovel.imagensImovel || []);
@@ -66,24 +60,29 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
     setPreviews([]);
   }, [imovel, initialFormData]);
 
-  // Previews para novos arquivos
   useEffect(() => {
     const urls = newFiles.map((f) => URL.createObjectURL(f));
     setPreviews(urls);
-
     return () => urls.forEach((u) => URL.revokeObjectURL(u));
   }, [newFiles]);
 
-  // Carrega cidades/bairros/vilas conforme selects
   useEffect(() => {
     if (formData.estadoId) loadCidades(formData.estadoId);
-  }, [formData.estadoId]);
+  }, [formData.estadoId, loadCidades]);
   useEffect(() => {
     if (formData.cidadeId) loadBairros(formData.cidadeId);
-  }, [formData.cidadeId]);
+  }, [formData.cidadeId, loadBairros]);
   useEffect(() => {
     if (formData.bairroId) loadVilas(formData.bairroId);
-  }, [formData.bairroId]);
+  }, [formData.bairroId, loadVilas]);
+
+  const getInputClass = (fieldName) => {
+    const baseClasses =
+      "border hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200 w-full";
+    const value = formData[fieldName];
+    const isValid = value !== null && value !== undefined && value !== "";
+    return `${baseClasses} ${isValid ? "border-green-500" : "border-gray-400"}`;
+  };
 
   const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
@@ -95,7 +94,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
           ? null
           : Number(value)
         : value;
-
     setFormData((prev) => ({ ...prev, [name]: val }));
 
     if (name === "estadoId") {
@@ -117,26 +115,20 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
 
   const handleNewFiles = (e) =>
     setNewFiles((prev) => [...prev, ...e.target.files]);
-
   const handleRemoveExisting = (url) => {
     setExistingImages((prev) => prev.filter((img) => img !== url));
     setRemovedImages((prev) => [...prev, url]);
   };
-
-  const removeNewImage = (index) => {
+  const removeNewImage = (index) =>
     setNewFiles((prev) => prev.filter((_, i) => i !== index));
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Monta payload apenas com alterações
     const changedFields = {};
     Object.keys(formData).forEach((key) => {
       if (formData[key] !== initialFormData[key])
         changedFields[key] = formData[key];
     });
-
     onSubmit({
       ...changedFields,
       removedImages,
@@ -157,14 +149,13 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
             name="tipoTransacao"
             value={formData.tipoTransacao}
             onChange={handleChange}
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("tipoTransacao")}
             required
           >
             <option value="ALUGUEL">Aluguel</option>
             <option value="VENDA">Venda</option>
           </select>
         </div>
-
         <div className="flex flex-col">
           <label className="font-medium mb-1">
             Tipo imóvel <span className="text-red-500">*</span>
@@ -173,7 +164,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
             name="tipoImovel"
             value={formData.tipoImovel}
             onChange={handleChange}
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("tipoImovel")}
             required
           >
             <option value="">-- Selecione --</option>
@@ -195,7 +186,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
             <option value="ESTADIO">ESTÁDIO</option>
           </select>
         </div>
-
         <div className="flex flex-col">
           <label className="font-medium mb-1">
             Valor (R$) <span className="text-red-500">*</span>
@@ -207,11 +197,10 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
             value={formData.valor || ""}
             onChange={handleChange}
             placeholder="0.00"
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("valor")}
             required
           />
         </div>
-
         <div className="flex flex-col">
           <label className="font-medium mb-1">Título</label>
           <input
@@ -219,18 +208,18 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
             name="titulo"
             value={formData.titulo}
             onChange={handleChange}
-            className="border border-gray-400 hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200"
+            className={getInputClass("titulo")}
           />
         </div>
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Endereço */}
       <section>
         <p className="font-semibold mb-3">Endereço</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">
               Estado <span className="text-red-500">*</span>
             </label>
@@ -239,10 +228,10 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
               value={formData.estadoId || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("estadoId")}
             >
               <option value="">-- selecione --</option>
-              {(estadosLocalStorage && estadosLocalStorage.length > 0
+              {(estadosLocalStorage?.length > 0
                 ? estadosLocalStorage
                 : estados
               ).map((e) => (
@@ -251,8 +240,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 </option>
               ))}
             </select>
-
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Cidade <span className="text-red-500">*</span>
             </label>
             <select
@@ -260,7 +248,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
               value={formData.cidadeId || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("cidadeId")}
             >
               <option value="">-- selecione --</option>
               {cidades.map((c) => (
@@ -269,8 +257,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 </option>
               ))}
             </select>
-
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Bairro <span className="text-red-500">*</span>
             </label>
             <select
@@ -278,7 +265,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
               value={formData.bairroId || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("bairroId")}
             >
               <option value="">-- selecione --</option>
               {bairros.map((b) => (
@@ -288,14 +275,13 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
               ))}
             </select>
           </div>
-
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">Vila</label>
             <select
               name="vilaId"
               value={formData.vilaId || ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("vilaId")}
             >
               <option value="">-- selecione --</option>
               {vilas.map((v) => (
@@ -304,8 +290,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 </option>
               ))}
             </select>
-
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Rua <span className="text-red-500">*</span>
             </label>
             <input
@@ -314,10 +299,9 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
               value={formData.rua}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("rua")}
             />
-
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Número <span className="text-red-500">*</span>
             </label>
             <input
@@ -326,21 +310,19 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
               value={formData.numero}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("numero")}
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">CEP</label>
             <input
               type="text"
               name="cep"
               value={formData.cep}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("cep")}
             />
-
-            <label className="mb-1 mt-3">
+            <label className="mb-1">
               Área (m²) <span className="text-red-500">*</span>
             </label>
             <input
@@ -350,59 +332,55 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
               value={formData.area || ""}
               onChange={handleChange}
               required
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("area")}
             />
           </div>
         </div>
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Características */}
       <section>
         <p className="font-semibold mb-3">Características</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">Quartos</label>
             <input
               type="number"
               name="quarto"
-              value={formData.quarto || ""}
+              value={formData.quarto ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("quarto")}
             />
-
-            <label className="mb-1 mt-3">Banheiros</label>
+            <label className="mb-1">Banheiros</label>
             <input
               type="number"
               name="banheiro"
-              value={formData.banheiro || ""}
+              value={formData.banheiro ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("banheiro")}
             />
-
-            <label className="mb-1 mt-3">Garagem</label>
+            <label className="mb-1">Garagem</label>
             <input
               type="number"
               name="garagem"
-              value={formData.garagem || ""}
+              value={formData.garagem ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("garagem")}
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-3">
             <label className="mb-1">Suíte</label>
             <input
               type="number"
               name="suite"
-              value={formData.suite || ""}
+              value={formData.suite ?? ""}
               onChange={handleChange}
-              className="border border-gray-400 hover:border-blue-500 rounded p-2"
+              className={getInputClass("suite")}
             />
           </div>
-
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2 pt-2">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -410,10 +388,9 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 checked={!!formData.disponivel}
                 onChange={handleChange}
                 className="h-4 w-4"
-              />
+              />{" "}
               Imóvel Disponível
             </label>
-
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -421,10 +398,9 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 checked={!!formData.imovelDestaque}
                 onChange={handleChange}
                 className="h-4 w-4"
-              />
+              />{" "}
               Destaque
             </label>
-
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -432,10 +408,9 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 checked={!!formData.churrasqueira}
                 onChange={handleChange}
                 className="h-4 w-4"
-              />
+              />{" "}
               Churrasqueira
             </label>
-
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -443,10 +418,9 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 checked={!!formData.lavanderia}
                 onChange={handleChange}
                 className="h-4 w-4"
-              />
+              />{" "}
               Lavanderia
             </label>
-
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -454,14 +428,14 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                 checked={!!formData.aceitaPet}
                 onChange={handleChange}
                 className="h-4 w-4"
-              />
+              />{" "}
               Aceita Pet
             </label>
           </div>
         </div>
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Descrição */}
       <section>
@@ -470,15 +444,14 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
           name="descricao"
           value={formData.descricao}
           onChange={handleChange}
-          className="w-full border border-gray-400 hover:border-blue-500 rounded p-3 h-32 resize-y"
+          className={`${getInputClass("descricao")} h-32 resize-y`}
         />
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Imagens */}
       <section>
-        {/* Imagens Existentes */}
         {existingImages.length > 0 && (
           <div className="mb-6">
             <p className="font-semibold mb-3">Imagens Atuais do Imóvel</p>
@@ -488,15 +461,15 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                   <img
                     src={imageUrl}
                     alt={`imagem-imovel-${i}`}
-                    className="w-full h-24 object-cover rounded border"
+                    className="w-full h-24 object-cover rounded border border-gray-400"
                   />
                   <button
                     type="button"
                     onClick={() => handleRemoveExisting(imageUrl)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                     title="Remover imagem"
                   >
-                    ×
+                    x
                   </button>
                 </div>
               ))}
@@ -509,7 +482,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
           </div>
         )}
 
-        {/* Upload de Novas Imagens */}
         <div>
           <p className="font-semibold mb-3">Adicionar Novas Imagens</p>
           <label
@@ -532,7 +504,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
             className="hidden"
           />
 
-          {/* Previews das Novas Imagens */}
           {previews.length > 0 && (
             <div className="mt-3">
               <p className="font-medium mb-2 text-sm">
@@ -544,15 +515,15 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
                     <img
                       src={src}
                       alt={`nova-imagem-${i}`}
-                      className="w-full h-24 object-cover rounded border"
+                      className="w-full h-24 object-cover rounded border border-gray-400"
                     />
                     <button
                       type="button"
                       onClick={() => removeNewImage(i)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       title="Remover nova imagem"
                     >
-                      ×
+                      x
                     </button>
                   </div>
                 ))}
