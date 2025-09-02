@@ -4,6 +4,7 @@ import Pesquisa from "./Pesquisa";
 import CriarImovel from "./CriarImovel";
 import ConfigImobiliaria from "./ConfigImobiliaria";
 import { ListarImovel } from "./ListarImovel";
+import { EditarImovel } from "./EditarImovel";
 
 export default function DashboardRoutes() {
   return (
