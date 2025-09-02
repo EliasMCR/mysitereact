@@ -32,7 +32,7 @@ export const ConfigImobiliaria = () => {
 
   const estadoLocalStorage = imobiliaria?.estado || [];
   const cidadeLocalStorage = imobiliaria?.cidade || [];
-  
+
   const [secoesAbertas, setSecoesAbertas] = useState({
     endereco: false,
     senha: false,
@@ -174,7 +174,7 @@ export const ConfigImobiliaria = () => {
         onSubmit={handleSubmit}
         className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4"
       >
-        <h3 className="text-2xl font-semibold mb-4">Configurações</h3>
+        <p className="text-4xl text-blue-500">Configurações</p>
 
         <DadosBasicos formData={formData} handleChange={handleChange} />
 

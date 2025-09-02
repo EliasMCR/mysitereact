@@ -6,7 +6,8 @@ export const EditarImovel = () => {
   const { imovel } = state || {};
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6">
+    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6 text-gray-800">
+      <p className="p-4 text-4xl text-blue-500">Editar imóvel</p>
       <Search imovel={imovel} />
     </div>
   );

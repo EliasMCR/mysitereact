@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { useEnderecos } from "../hooks/dashboard/useEnderecos";
+import { useEnderecoImob } from "../hooks/dashboard/useEnderecoImob";
 
 export const FormImovel = ({ onSubmit }) => {
   const imobiliaria = JSON.parse(localStorage.getItem("imobiliariaData")) || [];
-  const estadosLocalStorage = imobiliaria.estado || [];
+
+  // hook presonalizado que pega a lista de estados e cidades do local storage da propia imob
+  const { estadosLocalStorage, cidadesLocalStorage } = useEnderecoImob();
 
   const {
     estados,
@@ -16,28 +19,28 @@ export const FormImovel = ({ onSubmit }) => {
   } = useEnderecos();
 
   const initialFormData = {
-    area: null,
-    titulo: "",
-    valor: null,
-    banheiro: 0,
-    quarto: 0,
+    area: 99.0,
+    titulo: "teste agora",
+    valor: 500.0,
+    banheiro: 1,
+    quarto: 1,
     suite: 0,
     garagem: 0,
     lavanderia: false,
     churrasqueira: false,
     disponivel: true,
     aceitaPet: true,
-    tipoImovel: "",
+    tipoImovel: "CASA",
     tipoTransacao: "ALUGUEL",
     imovelDestaque: false,
-    descricao: "",
-    rua: "",
-    numero: "",
+    descricao: "teste 2set 15:16",
+    rua: "teste",
+    numero: "44",
     bairroId: null,
     vilaId: null,
     cidadeId: null,
     estadoId: null,
-    cep: "",
+    cep: "989000",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -211,7 +214,7 @@ export const FormImovel = ({ onSubmit }) => {
         </div>
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Endereço */}
       <section>
@@ -250,7 +253,10 @@ export const FormImovel = ({ onSubmit }) => {
               className={getInputClass("cidadeId")}
             >
               <option value="">-- selecione --</option>
-              {cidades.map((c) => (
+              {(cidadesLocalStorage && cidadesLocalStorage.length > 0
+                ? cidadesLocalStorage
+                : cidades
+              ).map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.nome}
                 </option>
@@ -343,7 +349,7 @@ export const FormImovel = ({ onSubmit }) => {
         </div>
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Características */}
       <section>
@@ -448,7 +454,7 @@ export const FormImovel = ({ onSubmit }) => {
         </div>
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Descrição */}
       <section>
@@ -461,13 +467,13 @@ export const FormImovel = ({ onSubmit }) => {
         />
       </section>
 
-      <hr />
+      <hr className="border-gray-400" />
 
       {/* Upload */}
       <section>
         <label
           htmlFor="fileInput"
-          className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-blue-500"
+          className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500"
         >
           <span className="material-symbols-outlined text-3xl">
             photo_camera

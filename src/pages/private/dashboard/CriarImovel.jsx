@@ -38,6 +38,7 @@ export const CriarImovel = () => {
 
       // Usar o hook para salvar imagens
       const urlsImagens = await salvarImagens(arquivos);
+      console.log("URLs das imagens salvas:", urlsImagens);
 
       // 2) envia dados do imóvel
       const responseCadastro = await fetch(`${BASE_URL}/imoveis/cadastro`, {
@@ -68,7 +69,7 @@ export const CriarImovel = () => {
   const isLoading = loading || loadingImagens;
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative text-gray-800">
       {isLoading && (
         <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-50">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
@@ -85,7 +86,7 @@ export const CriarImovel = () => {
       )}
 
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4">
-        <p className="p-4 text-4xl text-gray-500">Novo imóvel</p>
+        <p className="p-4 text-4xl text-blue-500">Novo imóvel</p>
         <FormImovel onSubmit={criarImovel} />
       </div>
     </div>
