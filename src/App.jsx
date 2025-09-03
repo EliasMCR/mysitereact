@@ -23,6 +23,7 @@ function App() {
           <Route path="/imobiliaria" element={<ImobiliariaPage />} />
           <Route path="/frametracker" element={<FrameTrackerPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<ImobiliariaPage />} />
           {/* Rotas privadas */}
           // App.jsx
           <Route

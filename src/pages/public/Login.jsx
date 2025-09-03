@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/AuthService";
 import { Spinner } from "../../components/ui/Spinner";
+import { NavLink } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -73,7 +74,7 @@ export default function Login() {
             <input
               type="email"
               id="inputEmail"
-              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none border-gray-400"
               placeholder="seuEmail@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -92,7 +93,7 @@ export default function Login() {
             <input
               type="password"
               id="inputPassword"
-              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none border-gray-400"
               placeholder="Sua senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
@@ -112,9 +113,9 @@ export default function Login() {
               />
               Lembrar-me
             </label>
-            <a href="/cadastro" className="text-blue-600 hover:underline">
+            <NavLink to="/cadastro" className="text-blue-600 hover:underline">
               Cadastre-se
-            </a>
+            </NavLink>
           </div>
 
           {/* Botão */}

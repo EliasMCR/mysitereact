@@ -12,7 +12,7 @@ export const NavMobilie = () => {
         to="/dashboard/criar"
         className={({ isActive }) =>
           `flex flex-col items-center hover:text-black ${
-            isActive ? "text-blue-500" : "text-gray-600"
+            isActive ? "text-blue-500 border-b-2" : "text-gray-600"
           }`
         }
       >
@@ -24,7 +24,7 @@ export const NavMobilie = () => {
         to="/dashboard/listar"
         className={({ isActive }) =>
           `flex flex-col items-center hover:text-black ${
-            isActive ? "text-blue-500" : "text-gray-600"
+            isActive ? "text-blue-500 border-b-2" : "text-gray-600"
           }`
         }
       >
@@ -36,7 +36,7 @@ export const NavMobilie = () => {
         to="/dashboard/editar"
         className={({ isActive }) =>
           `flex flex-col items-center hover:text-black ${
-            isActive ? "text-blue-500" : "text-gray-600"
+            isActive ? "text-blue-500 border-b-2" : "text-gray-600"
           }`
         }
       >
@@ -48,7 +48,7 @@ export const NavMobilie = () => {
         to="/dashboard/config"
         className={({ isActive }) =>
           `flex flex-col items-center hover:text-black ${
-            isActive ? "text-blue-500" : "text-gray-600"
+            isActive ? "text-blue-500 border-b-2" : "text-gray-600"
           }`
         }
       >

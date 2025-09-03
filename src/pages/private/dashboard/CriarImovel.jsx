@@ -58,6 +58,7 @@ export const CriarImovel = () => {
       const resultCadastro = await responseCadastro.text();
       console.log("Imóvel cadastrado com sucesso:", resultCadastro);
       alert(resultCadastro);
+      window.location.hrf = "/dashboard/listar"; // redireciona para lista de imóveis
     } catch (err) {
       console.error(err.message);
       alert(err.message);
@@ -69,6 +70,7 @@ export const CriarImovel = () => {
   const isLoading = loading || loadingImagens;
 
   return (
+
     <div className="min-h-screen relative text-gray-800">
       {isLoading && (
         <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-50">
