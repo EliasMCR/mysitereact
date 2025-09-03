@@ -5,8 +5,6 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
   const imobiliaria = JSON.parse(localStorage.getItem("imobiliariaData")) || [];
   const estadosLocalStorage = imobiliaria.estado || [];
 
-  
-
   const {
     estados,
     cidades,
@@ -19,7 +17,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
 
   const initialFormData = useMemo(
     () => ({
-      imovelId: imovel.imovelId || null,
+      imovelId: imovel.id || null,
       area: imovel.area ?? 99.0,
       titulo: imovel.titulo || "",
       valor: imovel.valor ?? 0,
@@ -135,7 +133,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
       ...changedFields,
       removedImages,
       newFiles,
-      imovelId: imovel.imovelId,
+      imovelId: imovel.id,
     });
   };
 
