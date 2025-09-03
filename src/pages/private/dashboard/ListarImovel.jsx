@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BASE_URL } from "../../../config";
 import { Card } from "../../../components/dashboard/Card";
 
+
 export const ListarImovel = () => {
   const [imoveis, setImoveis] = useState([]);
   const [loading, setLoading] = useState(false);

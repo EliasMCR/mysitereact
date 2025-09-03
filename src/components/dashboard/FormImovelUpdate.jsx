@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { useEnderecos } from "../hooks/dashboard/useEnderecos";
-import { Spinner } from "../../components/ui/Spinner";
 
 export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
   const imobiliaria = JSON.parse(localStorage.getItem("imobiliariaData")) || [];

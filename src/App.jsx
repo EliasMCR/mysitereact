@@ -12,11 +12,13 @@ import { CriarImovel } from "./pages/private/dashboard/CriarImovel";
 import { ListarImovel } from "./pages/private/dashboard/ListarImovel";
 import { EditarImovel } from "./pages/private/dashboard/EditarImovel";
 import { ConfigImobiliaria } from "./pages/private/dashboard/ConfigImobiliaria";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <div className="bg-[var(--secondary-bg-color)] min-h-screen">
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Rotas públicas */}
           <Route path="/" element={<Home />} />
