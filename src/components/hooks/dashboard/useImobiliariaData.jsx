@@ -30,7 +30,7 @@ export const useImobiliariaData = () => {
 
   useEffect(() => {
     const fetchImobiliaria = async () => {
-      const imobiliariaId = localStorage.getItem("imobiliariaId");
+      const imobiliariaId = localStorage.getItem("imobiliariaId"); //adicionado pelo login
       if (!imobiliariaId) return;
 
       try {

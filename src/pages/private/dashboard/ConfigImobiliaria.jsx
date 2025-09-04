@@ -7,6 +7,7 @@ import { SecaoEndereco } from "../../../components/dashboard/SecaoEndereco";
 import { SecaoAreaAtuacao } from "../../../components/dashboard/SecaoAreaAtuacao";
 import { getChangedFields } from "../../../components/utils/dashboard/getChangedFields";
 import { SecaoAddAreaAtuacao } from "../../../components/dashboard/SecaoAddAreaAtuacao";
+import { useRefreshImobiliaria } from "../../../components/hooks/dashboard/useRefreshImobiliaria";
 
 export const ConfigImobiliaria = () => {
   const {
@@ -31,7 +32,9 @@ export const ConfigImobiliaria = () => {
     setVilas,
   } = useEnderecos();
 
-  const estadoLocalStorage = imobiliaria?.estado || [];
+  const { refreshImobiliaria, loading: loadingRefresh } =
+    useRefreshImobiliaria();
+
   const cidadeLocalStorage = imobiliaria?.cidade || [];
 
   const [secoesAbertas, setSecoesAbertas] = useState({
@@ -165,14 +168,23 @@ export const ConfigImobiliaria = () => {
     if (!window.confirm("Tem certeza que deseja remover esta cidade?")) {
       return; // se cancelar, não faz nada
     }
+
+    if (!id) {
+      alert("ID da cidade inválido!");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${BASE_URL}/imobiliaria/removeCidade/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${BASE_URL}/imobiliaria/removeCidade?cidadeId=${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         throw new Error("Erro ao remover cidade");
@@ -198,7 +210,7 @@ export const ConfigImobiliaria = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ cidadeId }),
+        body: JSON.stringify(cidadeId),
       });
 
       if (!res.ok) {
@@ -206,13 +218,16 @@ export const ConfigImobiliaria = () => {
         throw new Error(errorText || "Erro ao adicionar cidade");
       }
 
-      const data = await res.json();
+      const data = await res.json(); // CidadeDTO retornada do backend
 
-      // Atualizar lista local (se você mantiver estado no pai)
-      // Exemplo: setCidadesLocal([...cidadesLocal, data]);
-      console.log("Cidade adicionada com sucesso:", data);
+      // Atualiza os dados da imobiliária com a função de refresh
+      const updatedData = await refreshImobiliaria();
+
+      // Atualiza o localStorage também
+      localStorage.setItem("imobiliariaData", JSON.stringify(updatedData));
 
       alert("Cidade adicionada com sucesso!");
+      window.location.reload();
     } catch (error) {
       console.error("Erro ao adicionar cidade:", error);
       alert(error.message || "Erro inesperado ao adicionar cidade.");
