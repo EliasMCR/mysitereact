@@ -85,7 +85,7 @@ export const DadosBasicos = ({ formData, handleChange }) => {
 
       <div className="md:col-span-2">
         <label className="block font-medium text-gray-950 mb-1">
-          Mensagem de aviso:
+          Mensagem de aviso do seu site:
         </label>
         <textarea
           name="mensagemAviso"

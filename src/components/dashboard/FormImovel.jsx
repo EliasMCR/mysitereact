@@ -65,7 +65,7 @@ export const FormImovel = ({ onSubmit }) => {
     // Um valor é válido se não for nulo, indefinido ou uma string vazia.
     // O número 0 é considerado um valor válido aqui (ex: 0 garagens).
     const isValid = value !== null && value !== undefined && value !== "";
-    return `${baseClasses} ${isValid ? "border-green-500" : "border-gray-400"}`;
+    return `${baseClasses} ${isValid ? "border-green-500 bg-green-50" : "border-gray-400"}`;
   };
 
   const handleChange = async (e) => {

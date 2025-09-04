@@ -6,6 +6,7 @@ import { DadosBasicos } from "../../../components/dashboard/DadosBasicos";
 import { SecaoEndereco } from "../../../components/dashboard/SecaoEndereco";
 import { SecaoAreaAtuacao } from "../../../components/dashboard/SecaoAreaAtuacao";
 import { getChangedFields } from "../../../components/utils/dashboard/getChangedFields";
+import { SecaoAddAreaAtuacao } from "../../../components/dashboard/SecaoAddAreaAtuacao";
 
 export const ConfigImobiliaria = () => {
   const {
@@ -160,6 +161,64 @@ export const ConfigImobiliaria = () => {
     }
   };
 
+  const handleDeleteCidade = async (id) => {
+    if (!window.confirm("Tem certeza que deseja remover esta cidade?")) {
+      return; // se cancelar, não faz nada
+    }
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/imobiliaria/removeCidade/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Erro ao remover cidade");
+      }
+
+      alert("Cidade removida com sucesso!");
+      setOriginalData((prev) => ({
+        ...prev,
+        cidade: prev.cidade.filter((c) => c.id !== id),
+      }));
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao remover cidade!");
+    }
+  };
+
+  const handleAddCidade = async (cidadeId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/imobiliaria/addCidade`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cidadeId }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Erro ao adicionar cidade");
+      }
+
+      const data = await res.json();
+
+      // Atualizar lista local (se você mantiver estado no pai)
+      // Exemplo: setCidadesLocal([...cidadesLocal, data]);
+      console.log("Cidade adicionada com sucesso:", data);
+
+      alert("Cidade adicionada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao adicionar cidade:", error);
+      alert(error.message || "Erro inesperado ao adicionar cidade.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -189,13 +248,6 @@ export const ConfigImobiliaria = () => {
             isOpen={secoesAbertas.endereco}
             onToggle={() => toggleSecao("endereco")}
           />
-
-          <SecaoAreaAtuacao
-            isOpen={secoesAbertas.areaAtuacao}
-            onToggle={() => toggleSecao("areaAtuacao")}
-            estadoLocal={estadoLocalStorage}
-            cidadeLocal={cidadeLocalStorage}
-          />
         </div>
 
         <input type="hidden" name="plano" value={formData.plano} />
@@ -207,6 +259,23 @@ export const ConfigImobiliaria = () => {
           Salvar Configurações
         </button>
       </form>
+      <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4 mt-4">
+        <SecaoAreaAtuacao
+          isOpen={secoesAbertas.areaAtuacao}
+          onToggle={() => toggleSecao("areaAtuacao")}
+          cidadeLocal={cidadeLocalStorage}
+          onDeleteCidade={handleDeleteCidade}
+        />
+      </div>
+
+      <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4 mt-4">
+        <SecaoAddAreaAtuacao
+          estados={estados}
+          cidades={cidades}
+          loadCidades={loadCidades}
+          onAddCidade={handleAddCidade}
+        />
+      </div>
     </div>
   );
 };

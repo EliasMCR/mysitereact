@@ -1,15 +1,9 @@
 export const SecaoAreaAtuacao = ({
   isOpen,
   onToggle,
-  estadoLocal = [],
   cidadeLocal = [],
+  onDeleteCidade,
 }) => {
-  // Criar array de objetos { estado, cidade } combinando os dois arrays
-  const dados = estadoLocal.map((estado, index) => ({
-    estado,
-    cidade: cidadeLocal[index] || "", // se não tiver cidade correspondente, fica vazio
-  }));
-
   return (
     <>
       <div className="md:col-span-2">
@@ -18,9 +12,7 @@ export const SecaoAreaAtuacao = ({
           onClick={onToggle}
           className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 p-3 rounded-lg transition-colors"
         >
-          <span className="font-medium text-gray-900">
-            Estados e cidades atendidas
-          </span>
+          <span className="font-medium text-gray-900">Cidades atendidas</span>
           <span className="text-gray-600">{isOpen ? "▼" : "▶"}</span>
         </button>
       </div>
@@ -32,10 +24,10 @@ export const SecaoAreaAtuacao = ({
               <thead className="bg-gray-100">
                 <tr>
                   <th className="px-4 py-2 text-left text-gray-700 font-semibold">
-                    Estado
+                    Cidade
                   </th>
                   <th className="px-4 py-2 text-left text-gray-700 font-semibold">
-                    Cidade
+                    Estado
                   </th>
                   <th className="px-4 py-2 text-center text-gray-700 font-semibold">
                     Ações
@@ -43,25 +35,37 @@ export const SecaoAreaAtuacao = ({
                 </tr>
               </thead>
               <tbody>
-                {dados.map((item, index) => (
+                {cidadeLocal.map((cidade, index) => (
                   <tr
                     key={index}
                     className="border-t border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-4 py-2">{item.estado.name}</td>
+                    <td className="px-4 py-2">{cidade.nome}</td>
                     <td className="px-4 py-2">
-                      {item.cidade.nome + " - " + (item.cidade.silgaEstado || "")}
+                      {cidade.estado} ({cidade.siglaEstado})
                     </td>
                     <td className="px-4 py-2 text-center">
                       <button
                         className="text-red-500 hover:text-red-700 transition-colors"
-                        onClick={() => console.log("Implementar exclusão")}
+                        onClick={() => onDeleteCidade(cidade.id)}
                       >
-                        <span className="material-icons">delete</span>
+                        <span className="material-symbols-outlined">
+                          delete
+                        </span>
                       </button>
                     </td>
                   </tr>
                 ))}
+                {cidadeLocal.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="px-4 py-2 text-center text-gray-500"
+                    >
+                      Nenhuma cidade cadastrada
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -81,7 +81,7 @@ export const FormImovelUpdate = ({ imovel = {}, onSubmit }) => {
       "border hover:border-blue-500 rounded p-2 focus:ring-2 focus:ring-blue-200 w-full";
     const value = formData[fieldName];
     const isValid = value !== null && value !== undefined && value !== "";
-    return `${baseClasses} ${isValid ? "border-green-500" : "border-gray-400"}`;
+    return `${baseClasses} ${isValid ? "border-green-500 bg-green-50" : "border-gray-400"}`;
   };
 
   const handleChange = async (e) => {
